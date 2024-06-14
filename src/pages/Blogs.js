@@ -12,6 +12,7 @@ const Blogs = ({posts}) => {
               key={post.id}
             >
                 <h3>{post.title}</h3>
+                <img className="img-thumbnail" src={post.pictureUrl} />
                <Link to={"/post/" + post.id}>Loe edasi</Link> 
             </div>
           )

@@ -7,13 +7,18 @@ const client = contentful.createClient({
 })
 
 async function getAllPosts() {
-    return client.getEntries()
-    .then((response) => {
-        console.log(response.items)
-        return response.items
-    })
-    .catch(console.error)
-
-}
+    try {
+        let result = await client.getEntries( {
+            content_type: 'post',
+            include: 2,
+        });
+        console.log(result.items)
+        return result.items;
+    } catch (err) {
+        console.error(err.message)
+        return [];
+    }
+ }
+ 
 
 export { getAllPosts }

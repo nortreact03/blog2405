@@ -8,6 +8,7 @@ import Blogs from "./pages/Blogs";
 import Contact from "./pages/Contact";
 import NoPage from "./pages/NoPage";
 import Services from './pages/Services';
+import AddPost from './pages/AddPost.js';
 import { useEffect, useState } from 'react';
 import Post from './pages/Post';
 import { getAllPosts } from './utils.js'
@@ -38,14 +39,16 @@ export default function App() {
   ])
 
   const fetchPosts = async () => {
-    let allData = await getAllPosts();
-    let posts = allData.filter(p => p.sys.contentType.sys.id === 'post')
-    console.log(posts)
+    let posts = await getAllPosts();
     setPosts(posts.map((p => {
+      console.log(p.fields)
+      const picUrl = p.fields.picture?.fields.file.url
       return {
         id: p.sys.id,
         title: p.fields.title,
-        content: p.fields.snipet
+        annotation: p.fields.snipet,
+        content: p.fields.content,
+        pictureUrl: picUrl ? 'https:' + p.fields.picture?.fields.file.url : null
       }
     })))
   }
@@ -53,6 +56,22 @@ export default function App() {
   useEffect(() => {
     fetchPosts()
   }, [])
+
+  const addPost = async (newPost) => {
+    console.log('Will post', newPost)
+    try {
+    const response = await fetch("http://localhost:8000/api/post", {
+      method: 'POST',
+      headers: {
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify(newPost)
+
+    })
+  } catch (err) {
+    console.log(err.message)
+  }
+  }
 
   return (
     <BrowserRouter>
@@ -64,6 +83,7 @@ export default function App() {
           <Route path="post/:postId" element={<Post posts={posts} />} />
           <Route path="contact" element={<Contact />} />
           <Route path="services" element={<Services />} />
+          <Route path="admin" element={<AddPost addPost={addPost} />} />
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>
